@@ -4,6 +4,7 @@ import sqlite3
 
 #%--------------------------------------
 def menuOpciones():
+	
 	menuPrincipal	=	['#################################################\n|'
 						'|Seleccione una de las siguientes opciones:	|\n'
 						'|\t\t\t\t\t\t|\n'
@@ -19,10 +20,12 @@ def menuOpciones():
 
 	for i in menuPrincipal:
 		print(i)
-
+	
+	opcion = controlOpciones(menuPrincipal)
 #-------------------
-def controlOpciones(opcion, menuActual):	
+def controlOpciones(menuActual):	
 	#control de ingreso válido
+	
 	while True:		#bucle para reiteración por error
 		
 		try:
@@ -40,6 +43,7 @@ def controlOpciones(opcion, menuActual):
 			
 #-------------------			
 def crearTabla():
+	
 	conexion = sqlite3.connect("INVENTARIO.db")		#toda variable y comando de interacción con la base de datos implementará mayúsculas
 	cursor = conexion.cursor()
 	
@@ -56,20 +60,52 @@ def crearTabla():
 	conexion.close()
 	
 #-------------------
-def mostrarInventario():
+def mostrarInventario(opcionSubMenu):
+	
+	mostrarSubMenu =	['1> Mostrar inventario completo.\n',
+						 '2> Mostar productos fuera de stock.\n',
+						 '3> Mostar productos sin ubicar.\n',
+						 '4> Mostrar productos sin proveedores.\n',
+						 '5> Mostar productos sin precio.']
+	
+	for i in mostrarSubMenu:
+		print(i)
+	
+	opcionSubMenu = controlOpciones(mostrarSubMenu)
+	
 	conexion = sqlite3.connect("INVENTARIO.db")
 	cursor = conexion.cursor()
 	
-	query = "SELECT * FROM PRODUCTOS"
-	cursor.execute(query)
+	if opcionSubMenu == 1:
+		query = "SELECT * FROM PRODUCTOS"
+		cursor.execute(query)
+		inventario = cursor.fetchall()
 	
-	inventario = cursor.fetchall()
-	
+	elif opcionSubMenu == 2:
+		query = "SELECT * FROM PRODUCTOS WHERE STOCK = 0"
+		cursor.execute(query)
+		inventario = cursor.fetchall()
+		
+	elif opcionSubMenu == 3:
+		query = "SELECT * FROM PRODUCTOS WHERE UBICACION = NULL"
+		cursor.execute(query)
+		inventario = cursor.fetchall()
+		
+	elif opcionSubMenu == 4:
+		query = "SELECT * FROM PRODUCTOS WHERE PROVEEDOR = NULL"
+		cursor.execute(query)
+		inventario = cursor.fetchall()
+		
+	elif opcionSubMenu == 5:
+		query = "SELECT * FROM PRODUCTOS WHERE PRECIO = NULL"
+		cursor.execute(query)
+		inventario = cursor.fetchall()
+		
 	if len(inventario) == 0:
-		print('El inventario se encuentra vacío.')
+		print('No hay productos que mostrar.')
 	else:
-		return(inventario)
-	
+		print(inventario)
+		
 	conexion.close()
 
 #-------------------
